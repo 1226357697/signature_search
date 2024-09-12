@@ -138,7 +138,8 @@ void test_search_signature_code(DWORD pid, const char* pattern)
 
 int main()
 {
-  sign
+  auto si =  signature_search::make_signaturer("ff25??48");
+
   //unsigned char buffer[] = {0x80, 0xc8, 0x01, 0x00, 0x00, 0x48, 0xff, 0x25, 0xa1, 0x48, 0x03, 0x00, 0xcc, 0xcc, 0xcc, 0xcc};
 
   //size_t i = sunday_search(buffer, sizeof(buffer), "ff25??48", strlen("ff25??48"));

@@ -85,3 +85,11 @@ size_t sunday_search(const unsigned char* buffer, size_t size, const char* patte
 {
   return sunday_search_enc(buffer, size, pattern, len, 0);
 }
+
+// PE
+size_t sunday_search_code_enc(const unsigned char* imagebase, const char* pattern, size_t len, unsigned char xorbyte)
+{
+  
+    
+  return size_t();
+}
