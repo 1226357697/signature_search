@@ -17,7 +17,7 @@ inline static unsigned char hexchar2byte(char ch)
   else if (ch >= 'a' && ch <= 'f')
     byte = ch - 'a' + 10;
   else
-    assert(false);
+    ;//assert(false);
 
   return byte;
 }
@@ -36,7 +36,7 @@ size_t sunday_search_enc(const unsigned char* buffer, size_t size, const char* p
 {
   assert(len % 2 == 0);
   if (len % 2 != 0)
-    return -1;
+    return SINATURE_SEARCH_NOT_FOUND;
 
   size_t byte_len = len >> 1;
   const int WILDCARD_INDEX = UCHAR_MAX + 1;
@@ -73,12 +73,12 @@ size_t sunday_search_enc(const unsigned char* buffer, size_t size, const char* p
       return i;
 
     if (i + byte_len >= size)
-      return -1;
+      return SINATURE_SEARCH_NOT_FOUND;
 
     int added = s_shift_array[buffer[i + byte_len]];
     i += added != 0 ? added : s_shift_array[WILDCARD_INDEX];
   }
-  return -1;
+  return SINATURE_SEARCH_NOT_FOUND;
 }
 
 size_t sunday_search(const unsigned char* buffer, size_t size, const char* pattern, size_t len)
@@ -86,10 +86,48 @@ size_t sunday_search(const unsigned char* buffer, size_t size, const char* patte
   return sunday_search_enc(buffer, size, pattern, len, 0);
 }
 
-// PE
+#ifdef _WIN32
+
+#include <Windows.h>
+size_t sunday_search_section_enc(const unsigned char* imagebase, const char* pattern, size_t len, unsigned char xorbyte, int attribute)
+{
+  PIMAGE_DOS_HEADER dos_hdr = (PIMAGE_DOS_HEADER)imagebase;
+  PIMAGE_NT_HEADERS nt_hdr = (PIMAGE_NT_HEADERS)(imagebase + dos_hdr->e_lfanew);
+  if(dos_hdr->e_magic != IMAGE_DOS_SIGNATURE  || nt_hdr->Signature != IMAGE_NT_SIGNATURE)
+    return SINATURE_SEARCH_NOT_FOUND;
+
+  PIMAGE_SECTION_HEADER sections = IMAGE_FIRST_SECTION(nt_hdr);
+  int sct_cnt = nt_hdr->FileHeader.SizeOfOptionalHeader;
+  for (int i = 0; i < sct_cnt; i++)
+  {
+    PIMAGE_SECTION_HEADER section = &sections[i];
+    if ((section->Characteristics & attribute) == attribute)
+    {
+      const unsigned char* buffer = imagebase + section->VirtualAddress;
+      size_t size = section->Misc.VirtualSize;
+      size_t offset = sunday_search_enc(buffer, size, pattern, len, xorbyte);
+      if(offset != SINATURE_SEARCH_NOT_FOUND)
+        return offset + +section->VirtualAddress;
+    }
+  }
+
+  return SINATURE_SEARCH_NOT_FOUND;
+}
+
 size_t sunday_search_code_enc(const unsigned char* imagebase, const char* pattern, size_t len, unsigned char xorbyte)
 {
-  
-    
-  return size_t();
+  return sunday_search_section_enc(imagebase, pattern, len, xorbyte, IMAGE_SCN_MEM_EXECUTE);
 }
+
+size_t sunday_search_data_enc(const unsigned char* imagebase, const char* pattern, size_t len, unsigned char xorbyte)
+{
+  return sunday_search_section_enc(imagebase, pattern, len, xorbyte, IMAGE_SCN_MEM_READ | IMAGE_SCN_MEM_WRITE);
+}
+
+size_t sunday_search_rdata_enc(const unsigned char* imagebase, const char* pattern, size_t len, unsigned char xorbyte)
+{
+  return sunday_search_section_enc(imagebase, pattern, len, xorbyte, IMAGE_SCN_MEM_READ);
+}
+
+#endif // _WIN32
+
