@@ -145,3 +145,35 @@ size_t sunday_search_bytes(const unsigned char* buffer, size_t size, const uint8
 {
   return sunday_search_bytes_enc(buffer, size, bytes, len, mark, added, 0);
 }
+
+uint8_t* sunday_search_ptr_pattern_enc(const unsigned char* buffer, size_t size, const char* pattern, size_t len, int added, unsigned char xorbyte)
+{
+  size_t offset = sunday_search_pattern_enc(buffer, size, pattern, len, added, xorbyte);
+  if(offset == SINATURE_SEARCH_NOT_FOUND)
+    return NULL;
+  return (uint8_t*)(buffer + offset);
+}
+
+uint8_t* sunday_search_ptr_pattern(const unsigned char* buffer, size_t size, const char* pattern, size_t len, int added)
+{
+  size_t offset = sunday_search_pattern(buffer, size, pattern, len, added);
+  if (offset == SINATURE_SEARCH_NOT_FOUND)
+    return NULL;
+  return (uint8_t*)(buffer + offset);
+}
+
+uint8_t* sunday_search_ptr_bytes_enc(const unsigned char* buffer, size_t size, const uint8_t* bytes, size_t len, uint64_t mark, int added, unsigned char xorbyte)
+{
+  size_t offset = sunday_search_bytes_enc(buffer, size, bytes, len, mark, added, xorbyte);
+  if (offset == SINATURE_SEARCH_NOT_FOUND)
+    return NULL;
+  return (uint8_t*)(buffer + offset);
+}
+
+uint8_t* sunday_search_ptr_bytes(const unsigned char* buffer, size_t size, const uint8_t* bytes, size_t len, uint64_t mark, int added)
+{
+  size_t offset = sunday_search_bytes(buffer, size, bytes, len, mark, added);
+  if (offset == SINATURE_SEARCH_NOT_FOUND)
+    return NULL;
+  return (uint8_t*)(buffer + offset);
+}

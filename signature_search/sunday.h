@@ -13,6 +13,12 @@ extern "C"{
 	size_t sunday_search_bytes_enc(const unsigned char* buffer, size_t size, const uint8_t* bytes, size_t len, uint64_t mark, int added, unsigned char xorbyte);
 	size_t sunday_search_bytes(const unsigned char* buffer, size_t size, const uint8_t* bytes, size_t len, uint64_t mark, int added);
 
+	uint8_t* sunday_search_ptr_pattern_enc(const unsigned char* buffer, size_t size, const char* pattern, size_t len, int added, unsigned char xorbyte);
+	uint8_t* sunday_search_ptr_pattern(const unsigned char* buffer, size_t size, const char* pattern, size_t len, int added);
+
+	uint8_t* sunday_search_ptr_bytes_enc(const unsigned char* buffer, size_t size, const uint8_t* bytes, size_t len, uint64_t mark, int added, unsigned char xorbyte);
+	uint8_t* sunday_search_ptr_bytes(const unsigned char* buffer, size_t size, const uint8_t* bytes, size_t len, uint64_t mark, int added);
+
 #ifdef __cplusplus 
 }
 #endif // __cplusplus 
